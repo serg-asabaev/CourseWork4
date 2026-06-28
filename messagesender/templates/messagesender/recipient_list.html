@@ -1,0 +1,24 @@
+{% extends 'messagesender/base.html' %}
+
+{% block title %} Список получателей {% endblock %}
+
+{% block content %}
+
+<a class="btn btn-primary mb-5" href="{% url 'messagesender:recipient_create' %}" role="button">Добавить получателя</a>
+
+<h2>Список получателей</h2>
+<ul class="list-group">
+    {% for recipient in recipients %}
+        <li class="list-group-item">
+            <p>{{ recipient.fullname }}</p>
+            <p> {{ recipient.email }}</p>
+            <div class="btn-group">
+                <a class="btn btn-primary" href="{% url 'messagesender:recipient_detail' recipient.pk %}" role="button">Посмотреть</a>
+                <a class="btn btn-secondary" href="{% url 'messagesender:recipient_update' recipient.pk %}" role="button">Редактировать</a>
+                <a class="btn btn-danger" href="{% url 'messagesender:recipient_delete' recipient.pk %}" role="button">Удалить</a>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
