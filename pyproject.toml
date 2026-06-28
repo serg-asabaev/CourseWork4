@@ -1,0 +1,18 @@
+[project]
+name = "coursework4"
+version = "0.1.0"
+description = "course work number 4"
+authors = [
+    {name = "serg-asabaev@yandex.ru"}
+]
+license = {text = "0.0.1"}
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "django (>=6.0.6,<7.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
