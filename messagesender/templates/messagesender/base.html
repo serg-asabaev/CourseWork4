@@ -9,10 +9,10 @@
 </head>
 <body>
 <header>
-
+   {% include 'messagesender/includes/menu.html'%}
 </header>
 
-    <div class="container mb-5 pb-5" style="height:100vh">
+    <div class="container mb-5" style="height:100vh">
         {% block content %} {% endblock %}
     </div>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>

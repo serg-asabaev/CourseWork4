@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 
 class Recipient(models.Model):
@@ -12,3 +13,35 @@ class Recipient(models.Model):
         verbose_name = 'Получатель сообщения'
         verbose_name_plural = 'Получатели сообщения'
         ordering = ['fullname',]
+
+class Message(models.Model):
+    theme = models.CharField(max_length=150, verbose_name="Тема")
+    body = models.TextField(verbose_name="Тело письма")
+
+    def __str__(self):
+        return f'{self.body[:100]}'
+
+    class Meta:
+        verbose_name = 'Сообщение'
+        verbose_name_plural = 'Сообщения'
+        ordering = ['theme', ]
+
+class Sending(models.Model):
+    start_time = models.DateTimeField(verbose_name='Дата и время начала отправки')
+    end_time = models.DateTimeField(verbose_name='Дата и время окончания отправки')
+
+    status = models.CharField(max_length=50, verbose_name='Статус')
+
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='message', verbose_name='Сообщение')
+    recipients = models.ManyToManyField(Recipient, related_name='recipient', verbose_name='Получатели сообщения')
+
+    def update_status(self):
+        now_time = datetime.now()
+
+        if self.start_time > now_time:
+            self.status = 'Создана'
+        elif self.start_time <= now_time <= self.end_time:
+            self.status = 'Запущена'
+        else:
+            self.status = 'Завершена'
+        self.save()

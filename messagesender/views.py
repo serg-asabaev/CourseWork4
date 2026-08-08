@@ -1,13 +1,14 @@
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
-from messagesender.models import Recipient
+from messagesender.models import Recipient, Message, Sending
 
 
 class IndexView(TemplateView):
     model = Recipient
     template_name = "messagesender/base.html"
 
+# Получатель
 class RecipientListView(ListView):
     model = Recipient
     context_object_name = 'recipients'
@@ -32,3 +33,31 @@ class RecipientDeleteView(DeleteView):
     model = Recipient
     context_object_name = 'recipient'
     success_url = reverse_lazy('messagesender:recipient_list')
+
+# Сообщение
+class MessageListView(ListView):
+    model = Message
+    context_object_name = 'messages'
+
+class MessageDetailView(DetailView):
+    model = Message
+    context_object_name = 'message'
+
+class MessageCreateView(CreateView):
+    model = Message
+    context_object_name = 'message'
+    fields = ('theme', 'body')
+    success_url = reverse_lazy('messagesender:message_list')
+
+class MessageUpdateView(UpdateView):
+    model = Message
+    context_object_name = 'message'
+    fields = ('theme', 'body')
+    success_url = reverse_lazy('messagesender:message_list')
+
+class MessageDeleteView(DeleteView):
+    model = Message
+    context_object_name = 'message'
+    success_url = reverse_lazy('messagesender:message_list')
+
+# Рассылка

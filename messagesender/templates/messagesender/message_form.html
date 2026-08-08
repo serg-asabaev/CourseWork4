@@ -1,10 +1,10 @@
 {% extends 'messagesender/base.html' %}
 
-{% block title %}Создание получателя{% endblock %}
+{% block title %}Создание сообщения{% endblock %}
 
 {% block content %}
 
-<h1> {% if recipient %} Создание получателя сообщения {% else %} Редактирования получателя сообщения {% endif %}</h1>
+<h1>{% if recipient %} Создание сообщения {% else %} Редактирования сообщения {% endif %}</h1>
 
 <div class="row text-center" style="grid-template-columns: 1fr 1fr 1fr;">
     <form class="row" method="post" enctype="multipart/form-data">
@@ -14,7 +14,7 @@
                 {{ form.as_p }}
             </div>
             <button class="btn btn-primary">
-                {% if recipient %}
+                {% if message %}
                 Сохранить
                 {% else %}
                 Создать
