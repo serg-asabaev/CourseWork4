@@ -19,7 +19,7 @@ class Message(models.Model):
     body = models.TextField(verbose_name="Тело письма")
 
     def __str__(self):
-        return f'{self.body[:100]}'
+        return f'{self.theme}: {self.body[:100]}'
 
     class Meta:
         verbose_name = 'Сообщение'
@@ -38,9 +38,14 @@ class Sending(models.Model):
     def update_status(self):
         now_time = datetime.now()
 
-        if self.start_time > now_time:
+        start_time = datetime(self.start_time.year, self.start_time.month, self.start_time.day,
+                              self.start_time.hour, self.start_time.minute, self.start_time.second)
+        end_time = datetime(self.end_time.year, self.end_time.month, self.end_time.day,
+                              self.end_time.hour, self.end_time.minute, self.end_time.second)
+
+        if start_time > now_time:
             self.status = 'Создана'
-        elif self.start_time <= now_time <= self.end_time:
+        elif start_time <= now_time <= end_time:
             self.status = 'Запущена'
         else:
             self.status = 'Завершена'

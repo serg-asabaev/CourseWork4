@@ -61,3 +61,33 @@ class MessageDeleteView(DeleteView):
     success_url = reverse_lazy('messagesender:message_list')
 
 # Рассылка
+
+class SendingListView(ListView):
+    model = Sending
+    context_object_name = 'sendings'
+
+class SendingDetailView(DetailView):
+    model = Sending
+    context_object_name = 'sending'
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        obj.update_status()  # ← пересчёт и сохранение статуса
+        return obj
+
+class SendingCreateView(CreateView):
+    model = Sending
+    context_object_name = 'sending'
+    fields = ('start_time', 'end_time', 'message', 'recipients')
+    success_url = reverse_lazy('messagesender:sending_list')
+
+class SendingUpdateView(UpdateView):
+    model = Sending
+    context_object_name = 'sending'
+    fields = ('start_time', 'end_time', 'message', 'recipients')
+    success_url = reverse_lazy('messagesender:sending_list')
+
+class SendingDeleteView(DeleteView):
+    model = Sending
+    context_object_name = 'sending'
+    success_url = reverse_lazy('messagesender:sending_list')
