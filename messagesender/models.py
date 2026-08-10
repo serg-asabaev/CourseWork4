@@ -50,3 +50,9 @@ class Sending(models.Model):
         else:
             self.status = 'Завершена'
         self.save()
+
+class SendingLog(models.Model):
+    attempt_time = models.DateTimeField(verbose_name='Дата и время попытки')
+    status = models.CharField(max_length=50, verbose_name='Статус')
+    server_response = models.TextField(verbose_name="Ответ почтового сервера")
+    sending = models.ForeignKey(Sending, on_delete=models.CASCADE, related_name='sending', verbose_name='Рассылка')

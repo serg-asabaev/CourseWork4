@@ -8,4 +8,5 @@ from messagesender.apps import MessagesenderConfig
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("messagesender.urls", namespace='messagesender')),
+    path("users/", include("users.urls", namespace='users')),
 ]

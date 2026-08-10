@@ -5,7 +5,7 @@ app_name = 'messagesender'
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
-    path('recipients/list', views.RecipientListView.as_view(), name='recipient_list'),
+    path('recipients/list/', views.RecipientListView.as_view(), name='recipient_list'),
     path('recipients/<int:pk>/detail/', views.RecipientDetailView.as_view(), name='recipient_detail'),
     path('recipients/create/', views.RecipientCreateView.as_view(), name='recipient_create'),
     path('recipients/<int:pk>/update/', views.RecipientUpdateView.as_view(), name='recipient_update'),
@@ -20,4 +20,5 @@ urlpatterns = [
     path('sendings/create/', views.SendingCreateView.as_view(), name='sending_create'),
     path('sendings/<int:pk>/update/', views.SendingUpdateView.as_view(), name='sending_update'),
     path('sendings/<int:pk>/delete/', views.SendingDeleteView.as_view(), name='sending_delete'),
+    path('sendings/<int:pk>/send/', views.SendingSendView.as_view(), name='sending_send'),
 ]
