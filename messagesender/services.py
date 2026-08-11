@@ -53,3 +53,27 @@ def active_sending_count():
 def get_recipients_count():
     return Recipient.objects.all().count()
 
+def get_success_attempts_count(sending: Sending):
+
+    attempts = SendingLog.objects.filter(sending=sending)
+    success_attempts = []
+
+    for attempt in attempts:
+        if attempt.status == 'Успешно':
+            success_attempts.append(attempt)
+
+    return len(success_attempts)
+
+def get_failed_attempts_count(sending: Sending):
+
+    attempts = SendingLog.objects.filter(sending=sending)
+    failed_attempts = []
+
+    for attempt in attempts:
+        if attempt.status == 'Не успешно':
+            failed_attempts.append(attempt)
+
+    return len(failed_attempts)
+
+def get_total_emails(sending: Sending):
+    return SendingLog.objects.filter(sending=sending).count()

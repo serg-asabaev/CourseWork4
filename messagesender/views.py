@@ -3,10 +3,12 @@ from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 
 from messagesender.models import Recipient, Message, Sending, SendingLog
 from messagesender.forms import SendingForm, SendingSendForm
-from messagesender.services import send_email, get_sending_count, active_sending_count, get_recipients_count
+from messagesender.services import (send_email, get_sending_count, active_sending_count, get_recipients_count,
+                                    get_success_attempts_count, get_failed_attempts_count, get_total_emails, )
 
 class IndexView(TemplateView):
     template_name = "messagesender/index.html"
@@ -96,11 +98,29 @@ class SendingCreateView(LoginRequiredMixin, CreateView):
     form_class = SendingForm
     success_url = reverse_lazy('messagesender:sending_list')
 
+    def form_valid(self, form):
+        sending = form.save()
+        user = self.request.user
+        sending.owner = user
+        sending.save()
+
+        return super().form_valid(form)
+
 class SendingUpdateView(LoginRequiredMixin, UpdateView):
     model = Sending
     context_object_name = 'sending'
     form_class = SendingForm
     success_url = reverse_lazy('messagesender:sending_list')
+
+    def form_valid(self, form):
+        sending = form.save()
+
+        if sending.owner is None:
+            user = self.request.user
+            sending.owner = user
+            sending.save()
+
+        return super().form_valid(form)
 
 class SendingDeleteView(LoginRequiredMixin, DeleteView):
     model = Sending
@@ -119,3 +139,14 @@ class SendingSendView(LoginRequiredMixin, View):
 
         return redirect('messagesender:sending_list')
 
+class SendingLogView(TemplateView):
+    template_name = "messagesender/sending_log.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sending = Sending.objects.get(id=self.kwargs['pk'])
+
+        context['success_attempts'] = get_success_attempts_count(sending)
+        context['failed_attempts'] = get_failed_attempts_count(sending)
+        context['total_attempts'] = get_total_emails(sending)
+        return context

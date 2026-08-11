@@ -1,6 +1,8 @@
 from datetime import datetime
 from django.db import models
 
+from users.models import User
+
 class Recipient(models.Model):
     email = models.CharField(max_length=100, unique=True, verbose_name="Email")
     fullname = models.CharField(max_length=150, verbose_name="Ф.И.О.")
@@ -18,6 +20,9 @@ class Message(models.Model):
     theme = models.CharField(max_length=150, verbose_name="Тема")
     body = models.TextField(verbose_name="Тело письма")
 
+    owner = models.ForeignKey(User, verbose_name='Владелец', blank=True, null=True, on_delete=models.SET_NULL,
+                              related_name='message_owner')
+
     def __str__(self):
         return f'{self.theme}: {self.body[:100]}'
 
@@ -34,6 +39,15 @@ class Sending(models.Model):
 
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='message', verbose_name='Сообщение')
     recipients = models.ManyToManyField(Recipient, related_name='recipient', verbose_name='Получатели сообщения')
+
+    owner = models.ForeignKey(User, verbose_name='Владелец', blank=True, null=True, on_delete=models.SET_NULL,
+                              related_name='sending_owner')
+
+    class Meta:
+        verbose_name = 'Рассылка'
+        verbose_name_plural = 'Рассылки'
+        ordering = ['message',]
+        permissions = [("can_view_others_sendings", "Can view others sendings")]
 
     def update_status(self):
         now_time = datetime.now()
