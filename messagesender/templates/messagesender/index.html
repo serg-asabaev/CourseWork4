@@ -1,0 +1,12 @@
+{% extends 'messagesender/base.html' %}
+
+{% block title %} Главная страница {% endblock %}
+
+{% block content %}
+<h2>Главная страница</h2>
+    <div class="container mb-5" style="height:100vh">
+        <p>Количество всех рассылок: {{ sendings_count }} </p>
+        <p>Количество активных рассылок: {{ active_sendings }}</p>
+        <p>Количество уникальных получателей: {{ recipients_count }} </p>
+    </div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'messagesender/base.html' %}
+
+{% block title %} Список рассылок {% endblock %}
+
+{% block content %}
+
+<a class="btn btn-primary mb-5" href="{% url 'messagesender:sending_create' %}" role="button">Добавить рассылку</a>
+
+<h2>Список рассылок</h2>
+<ul class="list-group">
+    {% for sending in sendings %}
+        {% if sending.owner == user or perms.messagesender.can_view_others_sendings %}
+        <li class="list-group-item">
+            <p>{{ sending.start_time }}</p>
+            <p>{{ sending.end_time }}</p>
+            <p>{{ sending.status }}</p>
+            <p>{{ sending.message }}</p>
+
+            <div class="btn-group">
+                <a class="btn btn-primary" href="{% url 'messagesender:sending_detail' sending.pk %}" role="button">Посмотреть</a>
+                {% if sending.owner == user  %}
+                <a class="btn btn-secondary" href="{% url 'messagesender:sending_update' sending.pk %}" role="button">Редактировать</a>
+                <a class="btn btn-danger" href="{% url 'messagesender:sending_delete' sending.pk %}" role="button">Удалить</a>
+                <a class="btn btn-secondary" href ="{% url 'messagesender:sending_log' sending.pk %}" role="button">Статистика рассылки</a>
+                {% endif %}
+
+            </div>
+            {% if perms.messagesender.can_view_others_sendings and sending.status != 'Завершена' %}
+            <form action="{% url 'messagesender:sending_stop' sending.pk %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-secondary">
+                    Заблокировать рассылку
+                </button>
+            </form>
+            {% endif %}
+            {% if sending.owner == user  %}
+            <form action="{% url 'messagesender:sending_send' sending.pk %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-primary">
+                    Выполнить рассылку
+                </button>
+            </form>
+            {% endif %}
+        </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+
+{% endblock %}

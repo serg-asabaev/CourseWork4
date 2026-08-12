@@ -1,0 +1,28 @@
+{% extends 'messagesender/base.html' %}
+
+{% block title %}Удаление получателя{% endblock %}
+
+{% block content %}
+
+<h1> Удаление получателя сообщения </h1>
+
+<div class="row text-center" style="grid-template-columns: 1fr 1fr 1fr;">
+    <form class="row" method="post" enctype="multipart/form-data">
+        <div class="card col-5">
+            <p> Вы действительно хотите удалить {{ recipient.fullname }}?</p>
+            <div class="card-body">
+                {% csrf_token %}
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-danger">
+                  Удалить
+              </button>
+              <a class="btn btn-outline-secondary" style="border-radius:5px" href="{% url 'messagesender:recipient_list' %}" role="button">
+                  Назад
+              </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

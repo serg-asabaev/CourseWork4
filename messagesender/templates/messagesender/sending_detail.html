@@ -1,0 +1,28 @@
+{% extends 'messagesender/base.html' %}
+
+{% block title %}Подробная информация о рассылке{% endblock %}
+
+{% block content %}
+
+<h1> Информация о рассылке </h1>
+<!--{{ product }}-->
+
+<div class="row text-center" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="card col-3 mt-5 mx-3 px-0 pb-3">
+        <div class="card-header">
+              <h5 class="card-title">{{ sending.message }}</h5>
+        </div>
+        <div class="card-body">
+            <p class="card_text">Дата начала рассылки: {{ sending.start_time }}</p>
+            <p class="card_text">Дата окончания рассылки: {{ sending.end_time }}</p>
+            <p class="card_text">Статус: {{ sending.status }}</p>
+            <p class="card_text">Сообщение: {{ sending.message }}</p>
+            <p class="card_text">Получатели: {{ sending.recipients }}</p>
+        </div>
+        <a class="btn btn-outline-secondary" style="border-radius:5px" href="{% url 'messagesender:sending_list' %}" role="button">
+            Назад
+        </a>
+    </div>
+</div>
+
+{% endblock %}
