@@ -8,6 +8,9 @@ class Recipient(models.Model):
     fullname = models.CharField(max_length=150, verbose_name="Ф.И.О.")
     comment = models.TextField(verbose_name="Комментарий")
 
+    owner = models.ForeignKey(User, verbose_name='Владелец', blank=True, null=True, on_delete=models.SET_NULL,
+                              related_name='recipient_owner')
+
     def __str__(self):
         return f'{self.fullname} {self.email}'
 

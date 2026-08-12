@@ -1,9 +1,9 @@
 from django.core.mail import send_mail
+from django.core.cache import cache
 from datetime import datetime
-import smtplib
 
-from .models import SendingLog, Sending, Recipient
-
+from .models import SendingLog, Sending, Message, Recipient
+from config.settings import CACHE_ENABLED
 
 def send_email(sending: Sending):
     subject = sending.message.theme
@@ -77,3 +77,57 @@ def get_failed_attempts_count(sending: Sending):
 
 def get_total_emails(sending: Sending):
     return SendingLog.objects.filter(sending=sending).count()
+
+def stop_sending(sending: Sending):
+
+    sending.status = 'Завершена'
+    now_date = datetime.now()
+    end_time = datetime(now_date.year, now_date.month, now_date.day, 0, 0, 0)
+    sending.end_time = end_time
+
+    sending.save()
+
+def get_recipient_from_cache():
+    """Получает данные о клиенте из кэша, если кэш пуст то возвращает данные из базы"""
+    if not CACHE_ENABLED:
+        return Recipient.objects.all()
+
+    key = "recipients_list"
+    recipients = cache.get(key)
+    if recipients is not None:
+        return recipients
+
+    recipients = Recipient.objects.all()
+    cache.set(key, recipients, 60)
+
+    return recipients
+
+def get_message_from_cache():
+    """Получает данные о сообщении из кэша, если кэш пуст то возвращает данные из базы"""
+    if not CACHE_ENABLED:
+        return Message.objects.all()
+
+    key = "messages_list"
+    messages = cache.get(key)
+    if messages is not None:
+        return messages
+
+    messages = Message.objects.all()
+    cache.set(key, messages, 60)
+
+    return messages
+
+def get_sending_from_cache():
+    """Получает данные о рассылке из кэша, если кэш пуст то возвращает данные из базы"""
+    if not CACHE_ENABLED:
+        return Sending.objects.all()
+
+    key = "products_list"
+    sendings = cache.get(key)
+    if sendings is not None:
+        return sendings
+
+    sendings = Sending.objects.all()
+    cache.set(key, sendings, 60)
+
+    return sendings

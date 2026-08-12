@@ -5,6 +5,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.edit import CreateView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import ListView, View
 
 from .forms import UserRegisterForm
 from config.settings import EMAIL_HOST_USER
@@ -48,3 +49,23 @@ def email_verification(request, token):
     user.is_active = True
     user.save()
     return redirect(reverse('users:login'))
+
+class UserListView(ListView):
+    model = User
+    context_object_name = 'users'
+    login_url = reverse_lazy('users:login')
+
+
+class UserBlockView(View):
+    model = User
+    context_object_name = 'user'
+    success_url = reverse_lazy('users:user_list')
+
+    def post(self, request, pk):
+        user = get_object_or_404(User, id=pk)
+
+        if user.is_active:
+            user.is_active = False
+        user.save()
+
+        return redirect('users:user_list')

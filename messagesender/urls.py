@@ -22,4 +22,5 @@ urlpatterns = [
     path('sendings/<int:pk>/delete/', views.SendingDeleteView.as_view(), name='sending_delete'),
     path('sendings/<int:pk>/send/', views.SendingSendView.as_view(), name='sending_send'),
     path('sendings/<int:pk>/sending_log/', views.SendingLogView.as_view(), name='sending_log'),
+    path('sendings/<int:pk>/sending_stop/', views.SendingStopView.as_view(), name='sending_stop')
 ]

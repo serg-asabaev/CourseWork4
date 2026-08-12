@@ -11,7 +11,6 @@
     {% for sending in sendings %}
         {% if sending.owner == user or perms.messagesender.can_view_others_sendings %}
         <li class="list-group-item">
-            <p>{{ sending.owner }}</p>
             <p>{{ sending.start_time }}</p>
             <p>{{ sending.end_time }}</p>
             <p>{{ sending.status }}</p>
@@ -24,13 +23,24 @@
                 <a class="btn btn-danger" href="{% url 'messagesender:sending_delete' sending.pk %}" role="button">Удалить</a>
                 <a class="btn btn-secondary" href ="{% url 'messagesender:sending_log' sending.pk %}" role="button">Статистика рассылки</a>
                 {% endif %}
+
             </div>
+            {% if perms.messagesender.can_view_others_sendings and sending.status != 'Завершена' %}
+            <form action="{% url 'messagesender:sending_stop' sending.pk %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-secondary">
+                    Заблокировать рассылку
+                </button>
+            </form>
+            {% endif %}
+            {% if sending.owner == user  %}
             <form action="{% url 'messagesender:sending_send' sending.pk %}" method="post">
                 {% csrf_token %}
                 <button class="btn btn-primary">
                     Выполнить рассылку
                 </button>
             </form>
+            {% endif %}
         </li>
         {% endif %}
     {% endfor %}

@@ -1,0 +1,34 @@
+{% extends 'messagesender/base.html' %}
+
+{% block title %} Список пользователей {% endblock %}
+
+{% block content %}
+
+<h2>Список пользователей</h2>
+<ul class="list-group">
+    {% for lists_user in users %}
+        {% if perms.messagesender.can_view_others_sendings %}
+        <li class="list-group-item">
+            <p>email: {{ lists_user.email }}</p>
+            <p>Телефон: {{ lists_user.phone }}</p>
+            <p>Страна: {{ lists_user.country }}</p>
+            {% if user.is_active %}
+            <p>Активен</p>
+            {% else %}
+            <p>Не активен</p>
+            {% endif %}
+
+            {% if lists_user.is_active and not lists_user == user %}
+            <form action="{% url 'users:user_block' user.pk %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-primary">
+                    Заблокировать пользователя
+                </button>
+            </form>
+            {% endif %}
+        </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+
+{% endblock %}

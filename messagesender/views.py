@@ -8,7 +8,8 @@ from django.core.exceptions import PermissionDenied
 from messagesender.models import Recipient, Message, Sending, SendingLog
 from messagesender.forms import SendingForm, SendingSendForm
 from messagesender.services import (send_email, get_sending_count, active_sending_count, get_recipients_count,
-                                    get_success_attempts_count, get_failed_attempts_count, get_total_emails, )
+                                    get_success_attempts_count, get_failed_attempts_count, get_total_emails, stop_sending,
+                                    get_recipient_from_cache, get_message_from_cache, get_sending_from_cache )
 
 class IndexView(TemplateView):
     template_name = "messagesender/index.html"
@@ -27,6 +28,10 @@ class RecipientListView(LoginRequiredMixin, ListView):
     context_object_name = 'recipients'
     login_url = reverse_lazy('users:login')
 
+    def get_queryset(self):
+        return get_recipient_from_cache()
+
+
 class RecipientDetailView(LoginRequiredMixin, DetailView):
     model = Recipient
     context_object_name = 'recipient'
@@ -37,11 +42,29 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
     fields = ('fullname', 'email', 'comment')
     success_url = reverse_lazy('messagesender:recipient_list')
 
+    def form_valid(self, form):
+        recipient = form.save()
+        user = self.request.user
+        recipient.owner = user
+        recipient.save()
+
+        return super().form_valid(form)
+
 class RecipientUpdateView(LoginRequiredMixin, UpdateView):
     model = Recipient
     context_object_name = 'recipient'
     fields = ('fullname', 'email', 'comment')
     success_url = reverse_lazy('messagesender:recipient_list')
+
+    def form_valid(self, form):
+        message = form.save()
+
+        if message.owner is None:
+            user = self.request.user
+            message.owner = user
+            message.save()
+
+        return super().form_valid(form)
 
 class RecipientDeleteView(LoginRequiredMixin, DeleteView):
     model = Recipient
@@ -55,6 +78,10 @@ class MessageListView(LoginRequiredMixin, ListView):
     context_object_name = 'messages'
     login_url = reverse_lazy('users:login')
 
+    def get_queryset(self):
+        return get_message_from_cache()
+
+
 class MessageDetailView(LoginRequiredMixin, DetailView):
     model = Message
     context_object_name = 'message'
@@ -65,11 +92,30 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     fields = ('theme', 'body')
     success_url = reverse_lazy('messagesender:message_list')
 
+    def form_valid(self, form):
+        message = form.save()
+        user = self.request.user
+        message.owner = user
+        message.save()
+
+        return super().form_valid(form)
+
+
 class MessageUpdateView(LoginRequiredMixin, UpdateView):
     model = Message
     context_object_name = 'message'
     fields = ('theme', 'body')
     success_url = reverse_lazy('messagesender:message_list')
+
+    def form_valid(self, form):
+        message = form.save()
+
+        if message.owner is None:
+            user = self.request.user
+            message.owner = user
+            message.save()
+
+        return super().form_valid(form)
 
 class MessageDeleteView(LoginRequiredMixin, DeleteView):
     model = Message
@@ -82,6 +128,9 @@ class SendingListView(LoginRequiredMixin, ListView):
     model = Sending
     context_object_name = 'sendings'
     login_url = reverse_lazy('users:login')
+
+    def get_queryset(self):
+        return get_sending_from_cache()
 
 class SendingDetailView(LoginRequiredMixin, DetailView):
     model = Sending
@@ -150,3 +199,15 @@ class SendingLogView(TemplateView):
         context['failed_attempts'] = get_failed_attempts_count(sending)
         context['total_attempts'] = get_total_emails(sending)
         return context
+
+class SendingStopView(View):
+    model = Sending
+    context_object_name = 'sending'
+    success_url = reverse_lazy('messagesender:sending_list')
+
+    def post(self, request, pk):
+        sending = get_object_or_404(Sending, id=pk)
+
+        stop_sending(sending)
+
+        return redirect('messagesender:sending_list')
